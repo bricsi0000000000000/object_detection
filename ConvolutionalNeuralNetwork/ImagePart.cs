@@ -25,6 +25,10 @@ namespace ConvolutionalNeuralNetwork
     {
         int size;
         double[,] pixels;
+        Point left_top_index;
+        Point left_bottom_index;
+        Point right_top_index;
+        Point right_bottom_index;
 
         public ImagePart(int size)
         {
@@ -89,9 +93,14 @@ namespace ConvolutionalNeuralNetwork
             }
         }
 
-        public ImagePart Pool(int s)
+        public Point LeftTopIndex { get => left_top_index; set => left_top_index = value; }
+        public Point LeftBottomIndex { get => left_bottom_index; set => left_bottom_index = value; }
+        public Point RightTopIndex { get => right_top_index; set => right_top_index = value; }
+        public Point RightBottomIndex { get => right_bottom_index; set => right_bottom_index = value; }
+
+        public ImagePart Pool(int pooling_size)
         {
-            if (size % s != 0)
+            if (size % pooling_size != 0)
             {
                 double[,] old_pixels = pixels;
                 pixels = new double[old_pixels.GetLength(0) + 1, old_pixels.GetLength(1) + 1];
@@ -116,23 +125,23 @@ namespace ConvolutionalNeuralNetwork
                 }
             }
 
-            int width = (size / s) + 1;
+            int width = (size / pooling_size) + 1;
             ImagePart image_part = new ImagePart(width);
 
-            for (int i = 0; i < pixels.GetLength(0); i += s)
+            for (int i = 0; i < pixels.GetLength(0); i += pooling_size)
             {
-                for (int j = 0; j < pixels.GetLength(1); j += s)
+                for (int j = 0; j < pixels.GetLength(1); j += pooling_size)
                 {
-                    ImagePart part = new ImagePart(s);
-                    for (int row = 0; row < s; row++)
+                    ImagePart part = new ImagePart(pooling_size);
+                    for (int row = 0; row < pooling_size; row++)
                     {
-                        for (int col = 0; col < s; col++)
+                        for (int col = 0; col < pooling_size; col++)
                         {
                             part.Pixels[row, col] = pixels[i + row, j + col];
                         }
                     }
 
-                    image_part.Pixels[i / s, j / s] = part.Max;
+                    image_part.Pixels[i / pooling_size, j / pooling_size] = part.Max;
                 }
             }
 
